@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # Descarga del artefacto
+    #..
     - name: Descarga del archivo bicep-template
       uses: actions/download-artifacts@v3
       with:
