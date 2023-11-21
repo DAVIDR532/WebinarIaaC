@@ -61,7 +61,7 @@ jobs:
         subscriptionId: ${{env.SUSCRIPTION-ID}}
         resourceGroupName: ${{env.RESOURCE-GROUP}}
         template: bicep-template/webapp.bicep
-        parameters: 'webappname=${{env.WEBAPP-NAME}} location=${{env.LOCATION}}'
+        parameters: 'webAppName=${{env.WEBAPP-NAME}} location=${{env.LOCATION}}'
         failOnStdErr: false
       
 
