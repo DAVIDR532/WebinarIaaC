@@ -1,0 +1,66 @@
+name: Iaac
+# Trigger
+on: [push, workflow_dispatch]
+
+env:
+  RESOURCE-GROUP: RG-Webinar-davidr
+  LOCATION: eastus
+  TEMPLATE-FILE: .azure/bicep/webapp.bicep
+  SUSCRIPTION-ID: 60835389-0713-4a20-8115-01a4724a2ab4
+  WEBAPP-NAME: webapp-davir
+
+jobs:
+
+  build-ci:
+    runs-on: ubuntu-latest
+    steps:
+    #checkout del repositorio
+    - uses: actions/checkout@v2
+    #Instalar nuget
+    #restore nuget
+    #build codigo
+    - name: Cargar archivo Bicep
+      uses: actions/upload-artifact@v3
+      with:
+        name: bicep-template
+        path: ${{env.TEMPLATE-FILE}}
+  
+  deploy-cd:
+    runs-on: ubuntu-latest
+    steps:
+    # Descarga del artefacto
+    - name: Descarga del archivo bicep-template
+      uses: actions/download-artifacts@v3
+      with:
+        name: bicep-template
+        path: bicep-template
+    
+    #Login Azure - Service Principal 
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds:${{secret.AZURE_CREDENTIALS}}
+
+    #Despliegue por Azure CLI
+
+    - name: Azure CLI Script
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.30.0
+        inlineScript: |
+          az account show
+          az group create -n ${{env.RESOURCE-GROUP}} -l ${{env.LOCATION}}
+    
+    # Despliegue de Infra del archivo Bicep
+
+    - name: Despliegue Bicep
+      uses: azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{env.SUSCRIPTION-ID}}
+        resourceGroupName: ${{env.RESOURCE-GROUP}}
+        template: bicep-template/webapp.bicep
+        parameters: 'webappname=${{env.WEBAPP-NAME}} location=${{env.LOCATION}}'
+        failOnStdErr: false
+      
+
